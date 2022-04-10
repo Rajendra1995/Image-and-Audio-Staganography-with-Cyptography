@@ -7,4 +7,3 @@ def encrypt(plain_text):
     f = Fernet(key)
     encrypted_text = f.encrypt(bytes(plain_text, "UTF-8"))
     return encrypted_text.decode(), key
-

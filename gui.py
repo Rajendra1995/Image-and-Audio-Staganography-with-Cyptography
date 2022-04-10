@@ -3,8 +3,8 @@ import pathlib
 import tkinter as tk
 from getpass import getuser
 from tkinter.filedialog import askopenfilename
-
 from main import encodeText, finalDecode
+from PIL import Image, ImageTk
 
 global name
 global label
@@ -13,71 +13,122 @@ global file_status
 
 def mainScreen():
     root = tk.Tk()
-    root.geometry("300x300")
     root.title("Steganography")
+    root.maxsize(width=400, height=400)
+    root.geometry("400x400")
+    # Adding a background image
+    background_image = Image.open("bg.jpg")
 
-    button = tk.Button(root, text="Encode", bg="grey", font=("Times New Roman", 14), height=2, command=encodeScreen)
-    button.grid(row=0, column=0, ipadx="50", pady="50", padx="50")
+    newImageSizeWidth = 400
+    newImageSizeHeight = 400
 
-    button1 = tk.Button(root, text="Decode", bg="grey", font=("Times New Roman", 14), height=2, command=decodeScreen)
-    button1.grid(row=1, column=0, ipadx="50", pady="20", padx="50")
+    background_image = background_image.resize((newImageSizeWidth, newImageSizeHeight), Image.Resampling.LANCZOS)
+    Canvas1 = tk.Canvas(root)
+    img = ImageTk.PhotoImage(background_image)
+    Canvas1.create_image(0, 0, image=img, anchor="nw")
+    Canvas1.config(bg="white", width=newImageSizeWidth, height=newImageSizeHeight)
+    Canvas1.pack(expand=True, fill="both")
 
+    headingFrame1 = tk.Frame(root, bg="#FFBB00", bd=5)
+    headingFrame1.place(relx=0.2, rely=0.1, relwidth=0.6, relheight=0.16)
+    headingLabel = tk.Label(headingFrame1, text="Welcome to \n Steganography",
+                            bg='black', fg='white', font=('Courier', 15))
+    headingLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
+    btn1 = tk.Button(root, text="Encoding", bg='black', fg='white', command=encodeScreen)
+    btn1.place(relx=0.28, rely=0.4, relwidth=0.45, relheight=0.1)
+
+    btn2 = tk.Button(root, text="Decoding", bg='black', fg='white', command=decodeScreen)
+    btn2.place(relx=0.28, rely=0.5, relwidth=0.45, relheight=0.1)
     root.mainloop()
 
 
 def encodeScreen():
     global name
     root = tk.Tk()
-    root.geometry("750x700")
-    root.title("Steganography")
+    root.geometry("700x700")
+    root.title("Steganography Encoding")
+    root.maxsize(width=1000, height=900)
+    canvas1 = tk.Canvas(root)
+    canvas1.config(bg="#ff6e40")
+    canvas1.pack(expand=True, fill="both")
+
+    # HEADING
+    headingFrame1 = tk.Frame(root, bg="#FFBB00", bd=5)
+    headingFrame1.place(relx=0.25, rely=0.03, relwidth=0.5, relheight=0.1)
+
+    headingLabel = tk.Label(headingFrame1, text="Encoding", bg='black', fg='white', font=('Courier', 15))
+    headingLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
 
     # File Selection
-    choose_audio_file = tk.Button(root, text="Choose an Audio File", bg="grey", font=("Times New Roman", 14), height=2,
-                                  command=lambda: open_file(1))
-    choose_audio_file.grid(row=0, column=0, ipadx="50", pady="20", padx="50")
+    labelFrame = tk.Frame(root, bg='#FFBB00', bd=5)
+    labelFrame.place(relx=0.05, rely=0.17, relwidth=0.9, relheight=0.75)
 
-    choose_image_file = tk.Button(root, text="Choose an Image File", bg="grey", font=("Times New Roman", 14), height=2,
+    choose_audio_file = tk.Button(labelFrame, text="Choose an Audio File", bg="grey", font=("Times New Roman", 14),
+                                  height=2,
+                                  command=lambda: open_file(1))
+    choose_audio_file.place(relx=0.1, rely=0.1, relwidth=0.35, relheight=0.08)
+
+    choose_image_file = tk.Button(labelFrame, text="Choose an Image File", bg="grey", font=("Times New Roman", 14),
+                                  height=2,
                                   command=lambda: open_file(2))
-    choose_image_file.grid(row=0, column=1, ipadx="50", pady="20", padx="50")
+    choose_image_file.place(relx=0.55, rely=0.1, relwidth=0.35, relheight=0.08)
 
     # FILE NAME
     global label
-    label = tk.Label(root, text="No chosen file")
-    label.grid(row=1, column=0, columnspan=2, ipadx="50", ipady="20", pady="20", padx="50")
+    label = tk.Label(labelFrame, text="No chosen file")
+    label.place(relx=0.3, rely=.22, relwidth=0.4, relheight=0.08)
 
     # MESSAGE ENTRY
-    msg_entry_label = tk.Label(root, text="Enter Secret Message :")
-    msg_entry_label.grid(row=2, column=0, ipadx="50", ipady="20", pady="20", padx="50")
-    message_entry = tk.Entry(root)
-    message_entry.grid(row=2, column=1, ipadx="50", ipady="20", pady="20", padx="50")
+    msg_entry_label = tk.Label(labelFrame, text="Enter Secret Message :")
+    msg_entry_label.place(relx=0.1, rely=.34, relwidth=0.25, relheight=0.08)
+    message_entry = tk.Entry(labelFrame)
+    message_entry.place(relx=0.4, rely=.34, relwidth=0.5, relheight=0.08)
     message_entry.insert(0, "Enter your secret msg")
 
     # FILE NAME
-    file_entry_label = tk.Label(root, text="Encoded File Name :")
-    file_entry_label.grid(row=3, column=0, ipadx="50", ipady="20", pady="20", padx="50")
-    file_entry = tk.Entry(root)
-    file_entry.grid(row=3, column=1, ipadx="50", ipady="20", pady="20", padx="50")
+    file_entry_label = tk.Label(labelFrame, text="New Encoded File Name :")
+    file_entry_label.place(relx=0.1, rely=.48, relwidth=0.25, relheight=0.08)
+    file_entry = tk.Entry(labelFrame)
+    file_entry.place(relx=0.4, rely=0.48, relwidth=0.5, relheight=0.08)
     file_entry.insert(0, "Enter encoded file name")
 
     # NORMAL ENCRYPTION BUTTON
-    message_button = tk.Button(root, text="Normal Encryption", bg="grey", font=("Times New Roman", 14), height=2,
+    message_button = tk.Button(labelFrame, text="Normal Encryption", bg="grey", font=("Times New Roman", 14), height=2,
                                command=lambda: encodeText(1, name, str(message_entry.get()),
                                                           str(file_entry.get()), msg, file_status))
-    message_button.grid(row=4, column=0, ipadx="50", pady="20", padx="50")
+    message_button.place(relx=0.1, rely=0.62, relwidth=0.35, relheight=0.08)
 
     # CIPHERTEXT ENCRYPTION BUTTON
 
-    message_button1 = tk.Button(root, text="Ciphertext Encryption", bg="grey", font=("Times New Roman", 14),
+    message_button1 = tk.Button(labelFrame, text="Ciphertext Encryption", bg="grey", font=("Times New Roman", 14),
                                 height=2,
                                 command=lambda: encodeText(2, name, str(message_entry.get()),
                                                            str(file_entry.get()), msg, file_status))
-    message_button1.grid(row=4, column=1, ipadx="50", pady="20", padx="50")
+    message_button1.place(relx=0.55, rely=0.62, relwidth=0.35, relheight=0.08)
 
-    msg_label = tk.Label(root, text="Status :")
-    msg_label.grid(row=5, column=0, ipadx="50", ipady="20", pady="20", padx="50")
+    # Hybrid Encryption
+    # RSA ENCRYPTION BUTTON
+
+    message_button3 = tk.Button(labelFrame, text="Hybrid Encryption", bg="grey", font=("Times New Roman", 14),
+                                height=2,
+                                command=lambda: encodeText(4, name, str(message_entry.get()),
+                                                           str(file_entry.get()), msg, file_status))
+    message_button3.place(relx=0.1, rely=0.76, relwidth=0.35, relheight=0.08)
+
+    # RSA ENCRYPTION BUTTON
+
+    message_button2 = tk.Button(labelFrame, text="RSA Encryption", bg="grey", font=("Times New Roman", 14),
+                                height=2,
+                                command=lambda: encodeText(3, name, str(message_entry.get()),
+                                                           str(file_entry.get()), msg, file_status))
+    message_button2.place(relx=0.55, rely=0.76, relwidth=0.35, relheight=0.08)
+
+    # Message
+    msg_label = tk.Label(labelFrame, text="Status :")
+    msg_label.place(relx=0.1, rely=0.90, relwidth=0.25, relheight=0.08)
     # SUCCESS MSG
-    msg = tk.Label(root, text="")
-    msg.grid(row=5, column=1, ipadx="50", ipady="20", pady="20", padx="50")
+    msg = tk.Label(labelFrame, text="")
+    msg.place(relx=0.4, rely=0.90, relwidth=0.5, relheight=0.08)
 
     root.mainloop()
 
@@ -91,15 +142,27 @@ def open_file(status):
     This function open the file dialog box for choosing the file.
     And then making two buttons : encrypt_button, decrypt_button
     """
-    username = getuser()
-    initial_directory = "C:/Users/{}".format(username)
-    name = askopenfilename(initialdir=initial_directory,
-                           filetypes=[("All Files", "*.*")],
-                           title="Choose a file."
-                           )
-    if name:
-        file_name = get_file_name(name, extension=True)
-        label.config(text=file_name)
+    if status == 1:
+        username = getuser()
+        initial_directory = "C:/Users/{}".format(username)
+        name = askopenfilename(initialdir=initial_directory,
+                               filetypes=[("Audio Files", "*.wav"), ("Audio Files", "*.mp3")],
+                               title="Choose a file."
+                               )
+        if name:
+            file_name = get_file_name(name, extension=True)
+            label.config(text=file_name)
+    elif status == 2:
+        username = getuser()
+        initial_directory = "C:/Users/{}".format(username)
+        name = askopenfilename(initialdir=initial_directory,
+                               filetypes=[("Image Files", "*.png"), ("Image Files", "*.jpg"),
+                                          ("Image Files", "*.jpeg")],
+                               title="Choose a file."
+                               )
+        if name:
+            file_name = get_file_name(name, extension=True)
+            label.config(text=file_name)
 
 
 def get_file_name(file_path, extension=False):
@@ -120,35 +183,68 @@ def get_file_name(file_path, extension=False):
 
 
 def decodeScreen():
+    global name
+    global label
     root = tk.Tk()
     root.geometry("750x600")
-    root.title("Steganography")
-    global name
-    choose_audio_file = tk.Button(root, text="Choose an Audio File", bg="grey", font=("Times New Roman", 14), height=2,
+    root.title("Steganography Decoding")
+    root.maxsize(width=1000, height=900)
+
+    canvas1 = tk.Canvas(root)
+    canvas1.config(bg="#ff6e40")
+    canvas1.pack(expand=True, fill="both")
+
+    # HEADING
+    headingFrame1 = tk.Frame(root, bg="#FFBB00", bd=5)
+    headingFrame1.place(relx=0.25, rely=0.03, relwidth=0.5, relheight=0.1)
+
+    headingLabel = tk.Label(headingFrame1, text="Decoding", bg='black', fg='white', font=('Courier', 15))
+    headingLabel.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+    # File Selection
+    labelFrame = tk.Frame(root, bg='#FFBB00', bd=5)
+    labelFrame.place(relx=0.05, rely=0.17, relwidth=0.9, relheight=0.75)
+
+    choose_audio_file = tk.Button(labelFrame, text="Choose an Audio File", bg="grey", font=("Times New Roman", 14),
+                                  height=2,
                                   command=lambda: open_file(1))
-    choose_audio_file.grid(row=0, column=0, ipadx="50", pady="20", padx="50")
+    choose_audio_file.place(relx=0.1, rely=0.1, relwidth=0.35, relheight=0.08)
 
-    choose_image_file = tk.Button(root, text="Choose an Image File", bg="grey", font=("Times New Roman", 14), height=2,
+    choose_image_file = tk.Button(labelFrame, text="Choose an Image File", bg="grey", font=("Times New Roman", 14),
+                                  height=2,
                                   command=lambda: open_file(2))
-    choose_image_file.grid(row=0, column=1, ipadx="50", pady="20", padx="50")
+    choose_image_file.place(relx=0.55, rely=0.1, relwidth=0.35, relheight=0.08)
 
-    global label
-    label = tk.Label(root, text="No chosen file")
-    label.grid(row=1, column=0, columnspan=2, ipadx="50", ipady="20", pady="20", padx="50")
+    # FILE NAME
 
-    message_button = tk.Button(root, text="Normal Decryption", bg="grey", font=("Times New Roman", 14), height=2,
+    label = tk.Label(labelFrame, text="No chosen file")
+    label.place(relx=0.3, rely=.22, relwidth=0.4, relheight=0.08)
+
+    message_button = tk.Button(labelFrame, text="Normal Decryption", bg="grey", font=("Times New Roman", 14), height=2,
                                command=lambda: finalDecode(name, 1, msg, file_status))
-    message_button.grid(row=2, column=0, ipadx="50", pady="20", padx="50")
+    message_button.place(relx=0.1, rely=0.34, relwidth=0.35, relheight=0.08)
 
-    message_button1 = tk.Button(root, text="Ciphertext Decryption", bg="grey", font=("Times New Roman", 14), height=2,
+    message_button1 = tk.Button(labelFrame, text="Ciphertext Decryption", bg="grey", font=("Times New Roman", 14),
+                                height=2,
                                 command=lambda: finalDecode(name, 2, msg, file_status))
-    message_button1.grid(row=2, column=1, ipadx="50", pady="20", padx="50")
+    message_button1.place(relx=0.55, rely=0.34, relwidth=0.35, relheight=0.08)
 
-    msg_label = tk.Label(root, text="Your Secret Message :")
-    msg_label.grid(row=3, column=0, ipadx="50", ipady="20", pady="20", padx="50")
+    message_button1 = tk.Button(labelFrame, text="Hybrid Decryption", bg="grey", font=("Times New Roman", 14),
+                                height=2,
+                                command=lambda: finalDecode(name, 4, msg, file_status))
+    message_button1.place(relx=0.1, rely=0.46, relwidth=0.35, relheight=0.08)
 
-    msg = tk.Label(root, text="")
-    msg.grid(row=3, column=1, ipadx="50", ipady="20", pady="20", padx="50")
+    message_button1 = tk.Button(labelFrame, text="RSA Decryption", bg="grey", font=("Times New Roman", 14),
+                                height=2,
+                                command=lambda: finalDecode(name, 3, msg, file_status))
+    message_button1.place(relx=0.55, rely=0.46, relwidth=0.35, relheight=0.08)
+
+    # Message
+    msg_label = tk.Label(labelFrame, text="Your Secret Message :")
+    msg_label.place(relx=0.1, rely=0.58, relwidth=0.25, relheight=0.08)
+
+    msg = tk.Label(labelFrame, text="")
+    msg.place(relx=0.4, rely=0.58, relwidth=0.5, relheight=0.08)
 
     root.mainloop()
 

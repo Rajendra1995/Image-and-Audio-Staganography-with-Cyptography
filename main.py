@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+
+import RSA_Encryption
 from encryption import encrypt
 from decryption import decrypt
 from audioencoder import decode, encode
@@ -27,10 +29,10 @@ def hideData(image, secret_message):
     if len(secret_message) > n_bytes:
         raise ValueError("Error encountered insufficient bytes, need bigger image or less data !!")
 
-    secret_message += "#####"  # you can use any string as the delimeter
+    secret_message += "#####"  # you can use any string as the delimiter
 
     data_index = 0
-    # convert input data to binary format using messageToBinary() fucntion
+    # convert input data to binary format using messageToBinary() function
     binary_secret_msg = messageToBinary(secret_message)
 
     data_len = len(binary_secret_msg)  # Find the length of data that needs to be hidden
@@ -72,10 +74,10 @@ def showData(image):
     decoded_data = ""
     for byte in all_bytes:
         decoded_data += chr(int(byte, 2))
-        if decoded_data[-5:] == "#####":  # check if we have reached the delimeter which is "#####"
+        if decoded_data[-5:] == "#####":  # check if we have reached the delimiter which is "#####"
             break
     # print(decoded_data)
-    return decoded_data[:-5]  # remove the delimeter to show the original hidden message
+    return decoded_data[:-5]  # remove the delimiter to show the original hidden message
 
 
 # Encode data into image
@@ -89,9 +91,26 @@ def encodeText(status, img_name, data, file_nam, msg, file_status):
         if len(data) == 0:
             raise ValueError('Data is empty')
 
+        # Freenet
         if status == 2:
             enc_data, key = encrypt(data)
             final_data = enc_data + str(key)
+
+        # RSA
+        elif status == 3:
+            final_data = RSA_Encryption.Encrypt(data)
+            string = [str(i) for i in final_data]
+            final_data = "a".join(string)
+
+        # RSA Freenet Hybrid
+        elif status == 4:
+            final_data = RSA_Encryption.Encrypt(data)
+            string = [str(i) for i in final_data]
+            final_data = "a".join(string)
+
+            enc_data, key = encrypt(final_data)
+            final_data = enc_data + str(key)
+
         else:
             final_data = data
         filename = str(file_nam) + ".png"
@@ -105,7 +124,7 @@ def encodeText(status, img_name, data, file_nam, msg, file_status):
 def decodeText(img_name):
     # read the image that contains the hidden image
 
-    image = cv2.imread(img_name)  # read the image using cv2.imread()
+    image = cv2.imread(img_name)  # read the image using
 
     text = showData(image)
     return text
@@ -121,6 +140,18 @@ def finalDecode(img_name, status, msg, file_status):
             message = de[0]
             key = de[1][0:-1]
             message = decrypt(message, key)
+
+        elif status == 3:
+            string = decoded.split('a')
+            message = RSA_Encryption.Decrypt(string)
+
+        elif status == 4:
+            de = decoded.split("b'")
+            message = de[0]
+            key = de[1][0:-1]
+            message = decrypt(message, key)
+            string = message.split('a')
+            message = RSA_Encryption.Decrypt(string)
         else:
             message = decoded
 
