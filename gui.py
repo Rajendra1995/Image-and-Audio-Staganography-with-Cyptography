@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfilename
 from main import encodeText, finalDecode
 from PIL import Image, ImageTk
 
-global name
+global name, label_txt, message_file, msg_file
 global label
 global file_status
 
@@ -43,7 +43,7 @@ def mainScreen():
 
 
 def encodeScreen():
-    global name
+    global name, msg_file
     root = tk.Tk()
     root.geometry("700x700")
     root.title("Steganography Encoding")
@@ -66,36 +66,44 @@ def encodeScreen():
     choose_audio_file = tk.Button(labelFrame, text="Choose an Audio File", bg="grey", font=("Times New Roman", 14),
                                   height=2,
                                   command=lambda: open_file(1))
-    choose_audio_file.place(relx=0.1, rely=0.1, relwidth=0.35, relheight=0.08)
+    choose_audio_file.place(relx=0.1, rely=0.05, relwidth=0.35, relheight=0.08)
 
     choose_image_file = tk.Button(labelFrame, text="Choose an Image File", bg="grey", font=("Times New Roman", 14),
                                   height=2,
                                   command=lambda: open_file(2))
-    choose_image_file.place(relx=0.55, rely=0.1, relwidth=0.35, relheight=0.08)
+    choose_image_file.place(relx=0.55, rely=0.05, relwidth=0.35, relheight=0.08)
 
     # FILE NAME
-    global label
+    global label, label_txt
     label = tk.Label(labelFrame, text="No chosen file")
-    label.place(relx=0.3, rely=.22, relwidth=0.4, relheight=0.08)
+    label.place(relx=0.3, rely=.16, relwidth=0.4, relheight=0.08)
 
     # MESSAGE ENTRY
     msg_entry_label = tk.Label(labelFrame, text="Enter Secret Message :")
-    msg_entry_label.place(relx=0.1, rely=.34, relwidth=0.25, relheight=0.08)
+    msg_entry_label.place(relx=0.1, rely=.26, relwidth=0.25, relheight=0.08)
     message_entry = tk.Entry(labelFrame)
-    message_entry.place(relx=0.4, rely=.34, relwidth=0.5, relheight=0.08)
+    message_entry.place(relx=0.4, rely=.26, relwidth=0.5, relheight=0.08)
     message_entry.insert(0, "Enter your secret msg")
+
+    # Message file
+    choose_message_file = tk.Button(labelFrame, text="Choose a Txt file", bg="grey", font=("Times New Roman", 14),
+                                    height=2, command=lambda: open_file(3))
+    choose_message_file.place(relx=0.1, rely=0.37, relwidth=0.30, relheight=0.08)
+
+    label_txt = tk.Label(labelFrame, text="No Message file Selected")
+    label_txt.place(relx=0.5, rely=.37, relwidth=0.4, relheight=0.08)
 
     # FILE NAME
     file_entry_label = tk.Label(labelFrame, text="New Encoded File Name :")
-    file_entry_label.place(relx=0.1, rely=.48, relwidth=0.25, relheight=0.08)
+    file_entry_label.place(relx=0.1, rely=.49, relwidth=0.25, relheight=0.08)
     file_entry = tk.Entry(labelFrame)
-    file_entry.place(relx=0.4, rely=0.48, relwidth=0.5, relheight=0.08)
+    file_entry.place(relx=0.4, rely=0.49, relwidth=0.5, relheight=0.08)
     file_entry.insert(0, "Enter encoded file name")
 
     # NORMAL ENCRYPTION BUTTON
     message_button = tk.Button(labelFrame, text="Normal Encryption", bg="grey", font=("Times New Roman", 14), height=2,
                                command=lambda: encodeText(1, name, str(message_entry.get()),
-                                                          str(file_entry.get()), msg, file_status))
+                                                          str(file_entry.get()), msg, file_status, msg_file))
     message_button.place(relx=0.1, rely=0.62, relwidth=0.35, relheight=0.08)
 
     # CIPHERTEXT ENCRYPTION BUTTON
@@ -103,7 +111,7 @@ def encodeScreen():
     message_button1 = tk.Button(labelFrame, text="Ciphertext Encryption", bg="grey", font=("Times New Roman", 14),
                                 height=2,
                                 command=lambda: encodeText(2, name, str(message_entry.get()),
-                                                           str(file_entry.get()), msg, file_status))
+                                                           str(file_entry.get()), msg, file_status, msg_file))
     message_button1.place(relx=0.55, rely=0.62, relwidth=0.35, relheight=0.08)
 
     # Hybrid Encryption
@@ -112,7 +120,7 @@ def encodeScreen():
     message_button3 = tk.Button(labelFrame, text="Hybrid Encryption", bg="grey", font=("Times New Roman", 14),
                                 height=2,
                                 command=lambda: encodeText(4, name, str(message_entry.get()),
-                                                           str(file_entry.get()), msg, file_status))
+                                                           str(file_entry.get()), msg, file_status, msg_file))
     message_button3.place(relx=0.1, rely=0.76, relwidth=0.35, relheight=0.08)
 
     # RSA ENCRYPTION BUTTON
@@ -120,7 +128,7 @@ def encodeScreen():
     message_button2 = tk.Button(labelFrame, text="RSA Encryption", bg="grey", font=("Times New Roman", 14),
                                 height=2,
                                 command=lambda: encodeText(3, name, str(message_entry.get()),
-                                                           str(file_entry.get()), msg, file_status))
+                                                           str(file_entry.get()), msg, file_status, msg_file))
     message_button2.place(relx=0.55, rely=0.76, relwidth=0.35, relheight=0.08)
 
     # Message
@@ -134,15 +142,15 @@ def encodeScreen():
 
 
 def open_file(status):
-    global label
+    global label, message_file, msg_file
     global name
     global file_status
-    file_status = status
     """
     This function open the file dialog box for choosing the file.
     And then making two buttons : encrypt_button, decrypt_button
     """
     if status == 1:
+        file_status = status
         username = getuser()
         initial_directory = "C:/Users/{}".format(username)
         name = askopenfilename(initialdir=initial_directory,
@@ -152,7 +160,9 @@ def open_file(status):
         if name:
             file_name = get_file_name(name, extension=True)
             label.config(text=file_name)
+
     elif status == 2:
+        file_status = status
         username = getuser()
         initial_directory = "C:/Users/{}".format(username)
         name = askopenfilename(initialdir=initial_directory,
@@ -163,6 +173,20 @@ def open_file(status):
         if name:
             file_name = get_file_name(name, extension=True)
             label.config(text=file_name)
+
+    elif status == 3:
+        username = getuser()
+        initial_directory = "C:/Users/{}".format(username)
+        message_file = askopenfilename(initialdir=initial_directory,
+                                       filetypes=[("Image Files", "*.txt")],
+                                       title="Choose a file.")
+        f = open(message_file, 'r')
+        msg_file = f.read()
+        print(msg_file)
+
+        if name:
+            file_name = get_file_name(name, extension=True)
+            label_txt.config(text=file_name)
 
 
 def get_file_name(file_path, extension=False):

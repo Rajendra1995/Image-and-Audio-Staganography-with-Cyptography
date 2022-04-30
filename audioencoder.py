@@ -11,11 +11,13 @@ def encode(status, audio_name, data, file_nam, msg):
     if status == 2:
         enc_data, file_name = encrypt(data)
         string = enc_data + str(file_name)
+        print("Fernet ", enc_data, str(file_name))
 
     elif status == 3:
         string1 = RSA_Encryption.Encrypt(data)
         string = [str(i) for i in string1]
         string = "a".join(string)
+        print("Rsa", string)
 
     elif status == 4:
         final_data = RSA_Encryption.Encrypt(data)
@@ -24,6 +26,7 @@ def encode(status, audio_name, data, file_nam, msg):
 
         enc_data, key = encrypt(final_data)
         string = enc_data + str(key)
+        print("Hybrid ", enc_data, str(key))
 
     else:
         string = data

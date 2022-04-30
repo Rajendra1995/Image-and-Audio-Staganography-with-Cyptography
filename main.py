@@ -81,7 +81,11 @@ def showData(image):
 
 
 # Encode data into image
-def encodeText(status, img_name, data, file_nam, msg, file_status):
+def encodeText(status, img_name, data, file_nam, msg, file_status, msg_file):
+    if len(msg_file) != 0:
+        data = msg_file
+        print(data)
+
     if file_status == 1:
         encode(status, img_name, data, file_nam, msg)
     else:
@@ -150,8 +154,11 @@ def finalDecode(img_name, status, msg, file_status):
             message = de[0]
             key = de[1][0:-1]
             message = decrypt(message, key)
+            print("decode", message)
+
             string = message.split('a')
             message = RSA_Encryption.Decrypt(string)
+
         else:
             message = decoded
 
